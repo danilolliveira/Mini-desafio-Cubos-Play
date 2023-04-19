@@ -7,12 +7,12 @@ import NextIcon from '../../assets/next.svg'
 
 
 
-export default function Controls() {
+export default function Controls({ currentMusic }) {
     return (
         <div className='container-controls'>
             <div className='preview-names'>
-                <h2>Título</h2>
-                <strong>Sub Títiulo</strong>
+                <h2> {currentMusic.title} </h2>
+                <strong> {currentMusic.artist} </strong>
             </div>
 
             <div className='container-player'>
