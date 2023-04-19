@@ -3,14 +3,36 @@ import Header from '../../components/header'
 import Controls from '../../components/controls';
 import Card from '../../components/card'
 import { musics } from '../../musics'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 
 function Home() {
   const [musicsData, setMusicsData] = useState([...musics])
   const [currentMusic, setCurrentMusic] = useState({ id: 0, title: '', artist: '' })
+  const audioRef = useRef(null)
+  const [iconBtn, setIconBtn] = useState('pause')
 
   function setMusic(music) {
+    audioRef.current.src = music.url;
+    setIconBtn('play')
     setCurrentMusic(music);
+  }
+
+  function handleChangeMusic(option) {
+    if (currentMusic.id === 0) {
+      return;
+    }
+
+    const newMusicId = option === 'next'
+      ? currentMusic.id + 1
+      : currentMusic.id - 1
+
+    const otherMusic = musicsData.find((music) => music.id === newMusicId)
+
+    if (!otherMusic) {
+      return;
+    }
+
+    setMusic(otherMusic)
   }
 
   return (
@@ -34,8 +56,14 @@ function Home() {
         </div>
       </main>
       <Controls
+        audioRef={audioRef}
         currentMusic={currentMusic}
+        iconBtn={iconBtn}
+        setIconBtn={setIconBtn}
+        handleChangeMusic={handleChangeMusic}
       />
+
+      <audio ref={audioRef} />
     </div>
   );
 }

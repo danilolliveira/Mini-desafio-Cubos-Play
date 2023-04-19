@@ -4,10 +4,39 @@ import PreviousIcon from '../../assets/previous.svg'
 import PlayIcon from '../../assets/play.svg'
 import PauseIcon from '../../assets/pause.svg'
 import NextIcon from '../../assets/next.svg'
+import { useRef, useState } from 'react'
 
 
 
-export default function Controls({ currentMusic }) {
+export default function Controls({ audioRef, currentMusic, iconBtn, setIconBtn, handleChangeMusic }) {
+
+    let intervalProgress = null;
+
+    const progressRef = useRef(null)
+
+    function playPause() {
+        intervalProgress = setInterval(() => {
+            if (audioRef.current.paused) {
+                clearInterval(intervalProgress)
+            }
+
+            const duration = audioRef.current.duration / 60;
+            const currentProgres = ((audioRef.current.currentTime / 60) * 100) / duration
+
+            progressRef.current.style.width = `${currentProgres}%`
+        }, 500);
+
+        if (audioRef.current.paused) {
+            audioRef.current.play();
+            setIconBtn('pause')
+            return;
+        }
+        audioRef.current.pause();
+        setIconBtn('play')
+
+
+    }
+
     return (
         <div className='container-controls'>
             <div className='preview-names'>
@@ -17,10 +46,29 @@ export default function Controls({ currentMusic }) {
 
             <div className='container-player'>
                 <div className='container-buttons'>
-                    <img src={StopIcon} alt="Stop Button" className='btn-control' />
-                    <img src={PreviousIcon} alt="Previous Button" className='btn-control' />
-                    <img src={PauseIcon} alt="" className='btn-play-pause' />
-                    <img src={NextIcon} alt="Next Button" className='btn-control' />
+                    <img
+                        src={StopIcon}
+                        alt="Stop Button"
+                        className='btn-control'
+                    />
+                    <img
+                        src={PreviousIcon}
+                        alt="Previous Button"
+                        className='btn-control'
+                        onClick={() => handleChangeMusic('previous')}
+                    />
+                    <img
+                        src={iconBtn === 'pause' ? PauseIcon : PlayIcon}
+                        alt=""
+                        className='btn-play-pause'
+                        onClick={() => playPause()}
+                    />
+                    <img
+                        src={NextIcon}
+                        alt="Next Button"
+                        className='btn-control'
+                        onClick={() => handleChangeMusic('next')}
+                    />
                 </div>
 
                 <div className='container-progress'>
@@ -28,7 +76,10 @@ export default function Controls({ currentMusic }) {
 
                     <div className='container-line'>
                         <div className='progress-line'></div>
-                        <div className='progress-line-color'></div>
+                        <div
+                            className='progress-line-color'
+                            ref={progressRef}
+                        ></div>
                     </div>
 
                     <strong className='end'>3:45</strong>
